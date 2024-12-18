@@ -74,6 +74,7 @@ start_docker_container.shの中身を適宜書き変えてください。
 # python3.10 numpy_test.py
 [1 2 3]
 ```
-
+以上で初期設定は終了になります。後は自由に編集してみてください。  
+git add .でステージングされないファイルやディレクトリは、git add ファイル名(ディレクトリ)で別途ステージングする手間がありました。
 ## 参考
 https://link.springer.com/article/10.1007/s10845-023-02252-8
