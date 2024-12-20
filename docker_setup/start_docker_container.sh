@@ -3,8 +3,9 @@
 docker run --name takagi_agv \
 	--gpus all \
 	-dit \
-	-v ~/investigation/SeniorThesisAGV/working:/working \
-  -w /working \
-	-e JUPYTER_TOKEN=315Stand \
+  -p 40870:8888 \
+	-v ~/investigation/SeniorThesisAGV/working:/workdir/working \
+  -w /workdir/working \
+	-e JUPYTER_TOKEN=555Stand \
 	--cpuset-cpus=24-31 \
 	takagi_agv:latest
