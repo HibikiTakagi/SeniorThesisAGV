@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.typing import NDArray
 from task import Task, DummyTask
-from map_maker import NODE_DISTANCES
+from test_map import TEST_NODE_DISTANCES
 
 class Pack:
   max_len_task = 3
@@ -89,15 +89,15 @@ class Pack:
     return time
 
 class DummyPack(Pack):
-  def __init__(self, p_id, task_list):
-    dummy_task_list = [DummyTask(0,0,0,NODE_DISTANCES) for _ in range(self.max_len_task)]
+  def __init__(self, p_id, task_list, graph):
+    dummy_task_list = [DummyTask(0,0,0,graph) for _ in range(self.max_len_task)]
     super().__init__(p_id, dummy_task_list)
     
 if __name__ == "__main__":
-  pack_a = Pack(0, [Task(0, 1, 8, 0, NODE_DISTANCES), Task(1, 2, 4, 2, NODE_DISTANCES), Task(2, 3, 5, 5, NODE_DISTANCES)])
+  pack_a = Pack(0, [Task(0, 1, 8, 0, TEST_NODE_DISTANCES), Task(1, 2, 4, 2, TEST_NODE_DISTANCES), Task(2, 3, 5, 5, TEST_NODE_DISTANCES)])
   print(pack_a)
   print(pack_a.mean_waiting_time(100))
   print(pack_a.worst_waiting_time(100))
   print(pack_a.is_complete)
   print(pack_a.sort_pack([1,2,0]))
-  print(pack_a.time_assume(NODE_DISTANCES))
+  print(pack_a.time_assume(TEST_NODE_DISTANCES))
