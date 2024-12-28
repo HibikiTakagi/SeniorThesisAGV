@@ -1,0 +1,17 @@
+# キャッシュ
+**/__pycache__/
+*.py[cod]
+
+# .pklファイル
+# （Pythonのpickle形式で保存されたデータファイル）
+*.pkl
+
+# .pthファイル
+# （PyTorchのモデルファイルや、Pythonパス指定ファイル）
+*.pth
+
+# プロファイラ
+working/perf/*
+
+# 簡易テスト用ファイル
+working/my_instant_test.py
