@@ -5,17 +5,25 @@ from map_maker import generate_mesh_base_scc_map, shortest_path_matrix
 from robot import generate_robot_list_random
 from task import generate_task_list_random
 
-DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu" )
+#DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu" )
 MODEL_PATH = "./save_data/model.pth"
-#DEVICE = torch.device("cpu")
+DEVICE = torch.device("cpu")
 
 ## 保存・読み込みに関する設定
 SAVE_FRAG = False
 LOAD_FRAG = True
 SAVE_FILE = './save_data/data.pkl'
 
+## 結果に関する設定
+FIG_LOSS_PATH = './save_data/loss.png'
+FIG_RET_PATH = './save_data/ret.png'
+FIG_REWARD_PATH = './save_data/reward.png'
+FIG_GANTT_RESOURCE_PATH = './save_data/gantt_resource.html'
+FIG_GANTT_TASK_PATH = './save_data/gantt_task.html'
+
 if LOAD_FRAG:
   ## 保存されたデータを読み込む場合
+  print("load from "+SAVE_FILE)
   with open(SAVE_FILE, 'rb') as f:
     load_data = pickle.load(f)
   CONNECT_DICT    = load_data["connect_dict"]
@@ -51,7 +59,7 @@ SAVE_DATA = {
   "distribute_policy_name" : DISTRIBUTE_POLICY_NAME
 }
 if SAVE_FRAG:
-  print("load from "+SAVE_FILE)
+  print("save to "+SAVE_FILE)
   with open(SAVE_FILE, 'wb') as f:
     pickle.dump(SAVE_DATA, f)
 
