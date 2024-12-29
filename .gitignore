@@ -2,6 +2,12 @@
 **/__pycache__/
 *.py[cod]
 
+# HTMLファイル
+*.html
+
+# PNGファイル
+*.png
+
 # .pklファイル
 # （Pythonのpickle形式で保存されたデータファイル）
 *.pkl
