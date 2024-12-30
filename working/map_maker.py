@@ -29,18 +29,6 @@ def shortest_path_matrix(direct):
   ## SciPyのshortest_path関数を用いて最短経路行列を計算
   return my_round_int(shortest_path(csr)).astype(int)
 
-SIMPLE_CONNECT_DICT = {
-  0:[1,3],
-  1:[0,2,4],
-  2:[1,5],
-  3:[0,4,6],
-  4:[1,3,5,7],
-  5:[2,4,8],
-  6:[3,7],
-  7:[4,6,8],
-  8:[5,7]
-}
-
 def generate_mesh_base_scc_fantom_map():
   """
   メッシュ構造を持つグリッドグラフを生成し、その中から最も大きい強連結成分（SCC）を抽出。
@@ -158,8 +146,6 @@ def generate_mesh_base_scc_map():
 #NODE_DISTANCES = shortest_path_matrix(CONNECT_DICT)
 
 if __name__ == "__main__":
-  print(print(shortest_path_matrix(SIMPLE_CONNECT_DICT)))
-  
   connect_dict = generate_mesh_base_scc_map()
   len_node = len(connect_dict)
   node_distances = shortest_path_matrix(connect_dict)
