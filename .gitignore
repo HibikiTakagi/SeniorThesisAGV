@@ -16,6 +16,9 @@
 # （PyTorchのモデルファイルや、Pythonパス指定ファイル）
 *.pth
 
+# ガントチャートのIPython Notebook
+gantt.ipynb
+
 # プロファイラ
 working/perf/*
 
