@@ -94,49 +94,13 @@ class Scheduler:
         robots_current_position[r_id] = pack.target_node
         robots_current_end_time[r_id] = end_time + pack_durations
     
-    """
-    for pack in self.pack_queue:
-      r_id = pack.robot_id
-      position = robots_current_position[r_id]
-      end_time = robots_current_end_time[r_id]
-      destination = pack.start_node
-      
-      move_task_name = f'M{r_id}-{robot_pack_count[r_id]}'
-      move_task_resource_allocation = self.robots[r_id].name
-      move_task_start_times = end_time
-      move_task_durations = graph[position, destination]
-      
-      tasks.append(move_task_name)
-      resource_allocation.append(move_task_resource_allocation)
-      start_times.append(move_task_start_times)
-      durations.append(move_task_durations)
-      
-      robot_pack_count[r_id] += 1
-      end_time += move_task_durations
-      position = pack.start_node
-      destination = pack.target_node
-      pack_durations = pack.time_assume(graph)
-      
-      tasks.append(pack.name)
-      resource_allocation.append(self.robots[r_id].name)
-      start_times.append(end_time)
-      durations.append(pack_durations)
-      
-      robots_current_position[r_id] = pack.target_node
-      robots_current_end_time[r_id] = end_time + pack_durations
-
-    Returns:
-      _type_: _description_
-    """
-    
     end_times = [start + duration for start, duration in zip(start_times, durations)]
     return resources, tasks, resource_allocation, start_times, durations, end_times
 
 if __name__ == "__main__":
   robots = [Robot(i, i) for i in range(2)]
-  print(robots)
   task_list = [
-    Task(i,i,i+1,0,TEST_NODE_DISTANCES) for i in range(7)
+    Task(i, i, i + 1, 0, TEST_NODE_DISTANCES) for i in range(7)
   ]
   scheduler = Scheduler(task_list, robots)
   scheduler.pack()
