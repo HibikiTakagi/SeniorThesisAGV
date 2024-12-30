@@ -19,12 +19,14 @@ class JobSchedulerEnv:
   #@profile
   def reset(self):
     for robot in self.robots:
+      #print(f"bpack:{robot.pack_list}")
       robot.reset()
+      #print(f"apack{robot.pack_list}")
     task_list = random.sample(TASK_LIST, len(TASK_LIST))
     self.scheduler.reset(task_list, self.robots)
     self.current_pack_id = 0
-    state = (self.scheduler.pack_queue[self.current_pack_id], self.scheduler.robots, extract_circular_sublist(self.scheduler.pack_queue, self.current_pack_id))
-    #state = (self.scheduler.pack_queue[self.current_pack_id], self.scheduler.robots, self.scheduler.pack_queue)        
+    #state = (self.scheduler.pack_queue[self.current_pack_id], self.scheduler.robots, extract_circular_sublist(self.scheduler.pack_queue, self.current_pack_id))
+    state = (self.scheduler.pack_queue[self.current_pack_id], self.scheduler.robots, self.scheduler.pack_queue)        
     info = None
     self.num_step = 0
 
@@ -66,11 +68,11 @@ class JobSchedulerEnv:
     self.num_step += 1
     self.current_pack_id += 1
     if self.is_terminal:
-      #state = (DummyPack(len(self.scheduler.pack_queue), [DummyTask(0,0,0,NODE_DISTANCES) for _ in range(DummyPack.max_len_task)], NODE_DISTANCES), self.scheduler.robots, self.scheduler.pack_queue) 
-      state = (DummyPack(len(self.scheduler.pack_queue), [DummyTask(0,0,0,NODE_DISTANCES) for _ in range(DummyPack.max_len_task)], NODE_DISTANCES), self.scheduler.robots, extract_circular_sublist(self.scheduler.pack_queue, 0)) 
+      state = (DummyPack(len(self.scheduler.pack_queue), [DummyTask(0,0,0,NODE_DISTANCES) for _ in range(DummyPack.max_len_task)], NODE_DISTANCES), self.scheduler.robots, self.scheduler.pack_queue) 
+      #state = (DummyPack(len(self.scheduler.pack_queue), [DummyTask(0,0,0,NODE_DISTANCES) for _ in range(DummyPack.max_len_task)], NODE_DISTANCES), self.scheduler.robots, extract_circular_sublist(self.scheduler.pack_queue, 0)) 
     else:
-      #state = (self.scheduler.pack_queue[self.current_pack_id], self.scheduler.robots, self.scheduler.pack_queue)
-      state = (self.scheduler.pack_queue[self.current_pack_id], self.scheduler.robots, extract_circular_sublist(self.scheduler.pack_queue, self.current_pack_id))
+      state = (self.scheduler.pack_queue[self.current_pack_id], self.scheduler.robots, self.scheduler.pack_queue)
+      #state = (self.scheduler.pack_queue[self.current_pack_id], self.scheduler.robots, extract_circular_sublist(self.scheduler.pack_queue, self.current_pack_id))
 
     reward = self.reward(action, self.current_state_viewer, state)
     terminated = self.is_terminal
@@ -123,3 +125,8 @@ class JobSchedulerEnv:
     #reward_dif_worst_avg = 1 / (ntime_worst - ntime_avg) if ntime_worst != ntime_avg else 1.0
 
     return - ((diff_worst+diff_avg) / np.sqrt(LEN_NODE)) ** 2
+  
+    ntime_late_job_agv = 0
+    for n_robot in next_robots:
+      ntime_late_job_agv += n_robot.queue_job_late_time_from_start(NODE_DISTANCES)
+    return - ntime_late_job_agv
