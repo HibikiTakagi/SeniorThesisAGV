@@ -48,7 +48,23 @@ class Robot:
       end_time += task_durations
             
     return end_time
+
+  def queue_job_late_time_from_start(self, graph:NDArray[np.int32]):
+    job_late_time = 0
+    current_node = self.start_node
+    for pack in self.pack_list:
+      destination = pack.start_node
+      move_task_durations = graph[current_node, destination]
+      job_late_time += 0 if move_task_durations==0 else 1/move_task_durations
             
+      current_node = pack.start_node
+      destination = pack.target_node
+            
+      task_durations = graph[current_node, destination]
+      job_late_time += 0 if task_durations==0 else 1/task_durations
+        
+    return job_late_time
+
 def generate_robot_list_random(number:int, len_node:int)->list[Robot]:
   assert number <= len_node
     
