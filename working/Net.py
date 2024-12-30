@@ -1,24 +1,35 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torchinfo import summary
 
 class Net(nn.Module):
   def __init__(self, input_size, hidden_size, output_size):
+    #print(output_size)
     super(Net, self).__init__()
     self.fc1 = nn.Linear(input_size, hidden_size) ## 入力層から隠れ層への全結合層
-    self.fc2 = nn.Linear(hidden_size, output_size) ## 隠れ層から出力層への全結合層
-
+    #self.fc2 = nn.Linear(hidden_size, output_size) ## 隠れ層から出力層への全結合層
+    
     self.adv = nn.Linear(hidden_size, output_size)
     self.v = nn.Linear(hidden_size, 1)
     self.output_size = output_size
+    
+    nn.init.kaiming_uniform_(self.fc1.weight, mode="fan_in", nonlinearity="relu") ## 一様分布で重みの初期化
+    #nn.init.kaiming_uniform_(self.fc2.weight, mode="fan_in", nonlinearity="relu")
+    nn.init.kaiming_uniform_(self.adv.weight, mode="fan_in", nonlinearity="relu")
+    nn.init.kaiming_uniform_(self.v.weight, mode="fan_in", nonlinearity="relu")
+    
+    #print(f"input:{input_size}")
+    #print(f"output:{output_size}")
+    #summary(model=self)
 
   def forward(self, x, mask=None):
     x = F.relu(self.fc1(x)) ## 隠れ層でReLU活性化関数を使用
     #x = self.fc2(x) ## 出力層（スコア）
-        
+    
     #if mask is not None:
-    #  x = x.masked_fill(mask == 0, float('-inf'))  ## マスクされた部分に-∞を設定
-
+    #  x = x.masked_fill(mask == 0, float('-inf'))  # マスクされた部分に-∞を設定
+    
     adv = self.adv(x)
     v = self.v(x)
     if adv.dim() == 1:  # 次元が不足している場合
@@ -26,10 +37,16 @@ class Net(nn.Module):
     if v.dim() == 1:  # 次元が不足している場合
       v = v.unsqueeze(1)
     average = adv.mean(1, keepdim=True)
-    x = v.expand(-1, self.output_size) + (adv - average.expand(-1, self.output_size))  
-    #x = F.softmax(x, dim=-1)  ## Softmaxを適用して確率を計算
+    #print("v")
+    #print(v.expand(-1, self.output_size))
+    #print(adv)
+    #print(average.expand(-1, self.output_size))
+    x = v.expand(-1, self.output_size) + (adv - average.expand(-1, self.output_size))
+    #print(f"fron_net:{x}")
     return x
-    
+
+
+
 if __name__ == "__main__":
   ## ハイパーパラメータ
   input_size = 4    ## 状態の次元数
