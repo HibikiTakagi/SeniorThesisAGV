@@ -62,7 +62,9 @@ class Scheduler:
     robots_current_position = [robot.start_node for robot in self.robots]
     robots_current_end_time = [0 for _ in self.robots]
     robot_pack_count = [0 for _ in self.robots]
-    
+
+    pack_waiting_times = [0 for _ in range(len(self.pack_queue))]
+
     for robot in self.robots:
       r_id = robot.id
       for pack in robot.pack_list:
@@ -93,9 +95,11 @@ class Scheduler:
         
         robots_current_position[r_id] = pack.target_node
         robots_current_end_time[r_id] = end_time + pack_durations
+        pack_waiting_times[pack.id] = robots_current_end_time[r_id]
     
     end_times = [start + duration for start, duration in zip(start_times, durations)]
-    return resources, tasks, resource_allocation, start_times, durations, end_times
+    robot_finish_times = robots_current_end_time
+    return resources, tasks, resource_allocation, start_times, durations, end_times, robot_finish_times, pack_waiting_times
 
 if __name__ == "__main__":
   robots = [Robot(i, i) for i in range(2)]
@@ -105,7 +109,7 @@ if __name__ == "__main__":
   scheduler = Scheduler(task_list, robots)
   scheduler.pack()
   scheduler.distribute()
-  resources, tasks, resource_allocation, start_times, durations, end_time = scheduler.dump_schedules(TEST_NODE_DISTANCES)
+  resources, tasks, resource_allocation, start_times, durations, end_time, robot_finish_times, pack_waiting_times = scheduler.dump_schedules(TEST_NODE_DISTANCES)
   print(f'resource:{resources}')
   print(f'tasks:{tasks}')
   print(f'allocation:{resource_allocation}')

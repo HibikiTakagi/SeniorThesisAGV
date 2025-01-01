@@ -20,6 +20,8 @@ FIG_RET_PATH = './save_data/ret.png'
 FIG_REWARD_PATH = './save_data/reward.png'
 FIG_GANTT_RESOURCE_PATH = './save_data/gantt_resource.html'
 FIG_GANTT_TASK_PATH = './save_data/gantt_task.html'
+CSV_THROUGHPUT_PATH = './save_data/throuput.csv'
+CSV_PACK_LATENCY_PATH = './save_data/pack_latency.csv'
 
 if LOAD_FRAG:
   ## 保存されたデータを読み込む場合
@@ -45,6 +47,7 @@ else:
   NUM_ROBOT = 10
   ROBOTS = generate_robot_list_random(NUM_ROBOT, LEN_NODE)
   NUM_TASK = 100
+  #NUM_TASK = 1200
   TASK_LIST = generate_task_list_random(NUM_TASK, LEN_NODE, NODE_DISTANCES)
   PACK_POLICY_NAME = "Naive"
   DISTRIBUTE_POLICY_NAME = "DQN"
