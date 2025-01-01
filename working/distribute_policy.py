@@ -22,20 +22,48 @@ class DistributePolicy:
   def distribute(self, pack_queue: list[Pack], robots: list[Robot]) -> None:
     pass
 
+  def step_distribute(self, action:int, pack:Pack, robots:list[Robot])->None:
+    robot_id = action
+    robots[robot_id].pack_list.append(pack)
+    pack.robot_id = robot_id
+    pack.current_node = pack.target_node
+    return robot_id
+
 class NaiveDistributePolicy(DistributePolicy):
   def __init__(self):
     super().__init__()
 
-  def distribute(self, pack_queue: list[Pack], robots: list[Robot]) -> None:
-    
-    len_robots = len(robots)
-    robot_id = 0
+  def distribute(self, pack_queue:list[Pack], robots:list[Robot])->None:
     for pack in pack_queue:
-      robot = robots[robot_id]
-      robot.pack_list.append(pack)
-      pack.robot_id = robot_id
+      action = self.act(pack, robots, pack_queue)
+      self.step_distribute(action, pack, robots)
+    
+  def act(self, pack:Pack, robots:list[Robot], pack_queue:list[Pack]):
+    robot_id = pack.id % len(robots)
+    return robot_id
 
-      robot_id = 0 if robot_id + 1 == len_robots else robot_id + 1
+class GreedyDistributePolicy(DistributePolicy):
+  def __init__(self):
+    super().__init__()
+    self.node_distances = NODE_DISTANCES
+    
+  def distribute(self, pack_queue, robots):
+    for pack in pack_queue:
+      action = self.act(pack, robots, pack_queue)
+      self.step_distribute(action, pack, robots)
+    
+  def reset(self, pack_queue, robots):
+    return super().reset(pack_queue, robots)
+    
+  def act(self, pack:Pack, robots:list[Robot], pack_queue:list[Pack]):
+    fast_time = np.inf
+    robot_id = -1
+    for robot in robots:
+      robot_time = robot.queue_time_from_start(self.node_distances)
+      if fast_time > robot_time:
+        fast_time = robot_time
+        robot_id = robot.id
+    return robot_id
 
 class DQN_DistributePolicy(DistributePolicy):
   def __init__(self):
@@ -97,20 +125,12 @@ class DQN_DistributePolicy(DistributePolicy):
       action = random.randrange(self.action_size)
     else:
       action = self.candidate_distribute(observation)
-    self.step_distribute(action, pack, robots)
     return observation, action
 
   def candidate_distribute(self, observation: NDArray[np.float32]):
     an_input = torch.tensor(observation).to(device=DEVICE).unsqueeze(0)
     action_robot_id = torch.argmax(self.model(an_input)).to("cpu").numpy()
     return action_robot_id
-
-  def step_distribute(self, action: int, pack: Pack, robots: list[Robot]):
-    robot_id = action
-    robots[robot_id].pack_list.append(pack)
-    pack.robot_id = robot_id
-    pack.current_node = pack.target_node
-    return robot_id
 
   #@profile
   def train(self):

@@ -3,7 +3,7 @@ from numpy.typing import NDArray
 from task import Task
 from robot import Robot
 from pack_policy import PackPolicy, NaivePackPolicy
-from distribute_policy import DistributePolicy, NaiveDistributePolicy, DQN_DistributePolicy
+from distribute_policy import DistributePolicy, NaiveDistributePolicy, DQN_DistributePolicy, GreedyDistributePolicy
 from test_map import TEST_NODE_DISTANCES
 
 from SETTING import PACK_POLICY_NAME, DISTRIBUTE_POLICY_NAME
@@ -15,6 +15,7 @@ PACK_POLICY_DICT = {
 DISTRIBUTE_POLICY_DICT = {
   "Naive" : NaiveDistributePolicy,
   "DQN"   : DQN_DistributePolicy,
+  "Greedy": GreedyDistributePolicy
 }
 
 PACK_POLICY = PACK_POLICY_DICT[PACK_POLICY_NAME]

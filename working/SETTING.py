@@ -10,8 +10,8 @@ MODEL_PATH = "./save_data/model.pth"
 DEVICE = torch.device("cpu")
 
 ## 保存・読み込みに関する設定
-SAVE_FRAG = False
-LOAD_FRAG = True
+SAVE_FRAG = True
+LOAD_FRAG = False
 SAVE_FILE = './save_data/data.pkl'
 
 ## 結果に関する設定
@@ -51,7 +51,8 @@ else:
   TASK_LIST = generate_task_list_random(NUM_TASK, LEN_NODE, NODE_DISTANCES)
   PACK_POLICY_NAME = "Naive"
   DISTRIBUTE_POLICY_NAME = "DQN"
-  #DISTRIBUTE_POLICY = "Naive"
+  #DISTRIBUTE_POLICY_NAME = "Naive"
+  #DISTRIBUTE_POLICY_NAME = "Greedy"
 
 ## 保存フラグが立っている場合、データを保存
 SAVE_DATA = {
