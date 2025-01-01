@@ -20,7 +20,7 @@ class Pack:
     
   @property
   def name(self):
-    return f'P{self.id}'
+    return f'P{self.id}:{self.start_node}-{self.target_node}'
     
   @property
   def is_complete(self):
