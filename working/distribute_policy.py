@@ -164,7 +164,7 @@ class DQN_DistributePolicy(DistributePolicy):
     else:
       #self.memory[self.memory_idx] = (self.make_observation(*state), action, reward, self.make_observation(*next_state), terminated, truncated, info)
       self.memory[self.memory_idx] = (state, action, reward, next_state, terminated, truncated, info)
-      self.memory_idx = 0 if self.memory_idx == self.memory_size else self.memory_idx + 1
+      self.memory_idx = 0 if self.memory_idx == self.memory_size - 1 else self.memory_idx + 1
 
   #@profile
   def make_observation(self, pack: Pack, robots: list[Robot], pack_queue: list[Pack]):
@@ -174,7 +174,7 @@ class DQN_DistributePolicy(DistributePolicy):
     状況に応じて、DummyPackの中身を変更したければ都合のいい範囲で変更して良い
     robotのノード、packのノードに関して相対位置か近さの指標を考える
     pack_queueは可能な範囲で情報を入れる
-    現在の観測情報は4次元に固定しているが、長さはなんでもいいので固定すること
+    観測情報の長さはなんでもいいので固定すること
     """
     #pack_queue = extract_circular_sublist(pack_queue, pack.id)
     
