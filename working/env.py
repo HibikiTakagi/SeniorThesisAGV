@@ -86,9 +86,9 @@ class JobSchedulerEnv:
     #print(f"S:{state}, A:{action}, Term:{terminated}, trunc:{truncated}")
     return state, reward, terminated, truncated, info
 
-  def reward(self, action: int, current_state: tuple[Pack, list[Robot], list[Pack]], next_state: tuple[Pack, list[Robot], list[Pack]]):
+  def reward_0(self, action: int, current_state: tuple[Pack, list[Robot], list[Pack]], next_state: tuple[Pack, list[Robot], list[Pack]]):
     """
-    やってはいけないこと：current_state, next_stateの中身をこの関数のなかで変更してはいけない
+    やってはいけないこと:current_state, next_stateの中身をこの関数のなかで変更してはいけない
     (値を変更した瞬間にmemoryに保存すべき情報との整合性がとれなくなるため)
 
     報酬に用いていい情報は全てこの引数の中にあるもののみと考えよ
@@ -98,10 +98,11 @@ class JobSchedulerEnv:
     """
     current_pack, current_robots, current_queue = current_state
     next_pack, next_robots, next_queue = next_state
+    return
 
-    #current_time = current_robots[action].queue_time_from_start(NODE_DISTANCES)
-    #next_time = next_robots[action].queue_time_from_start(NODE_DISTANCES)
-    #add_time_reward = - (next_time - current_time)
+  def reward_1(self, action: int, current_state: tuple[Pack, list[Robot], list[Pack]], next_state: tuple[Pack, list[Robot], list[Pack]]):
+    current_pack, current_robots, current_queue = current_state
+    next_pack, next_robots, next_queue = next_state
 
     ctime_worst = 0
     for c_robot in current_robots:
@@ -110,9 +111,7 @@ class JobSchedulerEnv:
     ntime_worst = 0
     for n_robot in next_robots:
       ntime_worst = max(n_robot.queue_time_from_start(NODE_DISTANCES), ntime_worst)
-
     diff_worst = ntime_worst - ctime_worst
-    #worst_time_reward = 1 / (ntime_worst - ctime_worst) if ntime_worst != ctime_worst else 1.0
 
     ctime_avg = 0
     for c_robot in current_robots:
@@ -123,13 +122,76 @@ class JobSchedulerEnv:
     for n_robot in next_robots:
       ntime_avg += n_robot.queue_time_from_start(NODE_DISTANCES)
     ntime_avg = ntime_avg / len(next_robots)
-
     diff_avg = ntime_avg - ctime_avg
-    #reward_dif_worst_avg = 1 / (ntime_worst - ntime_avg) if ntime_worst != ntime_avg else 1.0
 
     return - ((diff_worst+diff_avg) / np.sqrt(LEN_NODE)) ** 2
-  
+
+  def reward_2(self, action: int, current_state: tuple[Pack, list[Robot], list[Pack]], next_state: tuple[Pack, list[Robot], list[Pack]]):
+    current_pack, current_robots, current_queue = current_state
+    next_pack, next_robots, next_queue = next_state
+    
     ntime_late_job_agv = 0
     for n_robot in next_robots:
       ntime_late_job_agv += n_robot.queue_job_late_time_from_start(NODE_DISTANCES)
     return - ntime_late_job_agv
+
+  def reward_3(self, action: int, current_state: tuple[Pack, list[Robot], list[Pack]], next_state: tuple[Pack, list[Robot], list[Pack]]):
+    current_pack, current_robots, current_queue = current_state
+    next_pack, next_robots, next_queue = next_state
+    
+    current_time = current_robots[action].queue_time_from_start(NODE_DISTANCES)
+    next_time = next_robots[action].queue_time_from_start(NODE_DISTANCES)
+    add_time_reward = - (next_time - current_time)
+    return add_time_reward
+  
+  def reward_4(self, action: int, current_state: tuple[Pack, list[Robot], list[Pack]], next_state: tuple[Pack, list[Robot], list[Pack]]):
+    current_pack, current_robots, current_queue = current_state
+    next_pack, next_robots, next_queue = next_state
+    
+    ctime_worst = 0
+    for c_robot in current_robots:
+      ctime_worst = max(c_robot.queue_time_from_start(NODE_DISTANCES), ctime_worst)
+
+    ntime_worst = 0
+    for n_robot in next_robots:
+      ntime_worst = max(n_robot.queue_time_from_start(NODE_DISTANCES), ntime_worst)
+
+    worst_time_reward = 1 / (ntime_worst - ctime_worst) if ntime_worst != ctime_worst else 1.0
+    return worst_time_reward
+  
+  def reward_5(self, action: int, current_state: tuple[Pack, list[Robot], list[Pack]], next_state: tuple[Pack, list[Robot], list[Pack]]):
+    current_pack, current_robots, current_queue = current_state
+    next_pack, next_robots, next_queue = next_state
+    
+    ntime_worst = 0
+    for n_robot in next_robots:
+      ntime_worst = max(n_robot.queue_time_from_start(NODE_DISTANCES), ntime_worst)
+
+    ntime_avg = 0
+    for n_robot in next_robots:
+      ntime_avg += n_robot.queue_time_from_start(NODE_DISTANCES)
+    ntime_avg = ntime_avg / len(next_robots)
+
+    reward_dif_worst_avg = 1 / (ntime_worst - ntime_avg) if ntime_worst != ntime_avg else 1.0
+    return reward_dif_worst_avg
+  
+  def reward(self, action: int, current_state: tuple[Pack, list[Robot], list[Pack]], next_state: tuple[Pack, list[Robot], list[Pack]]):
+    current_pack, current_robots, current_queue = current_state
+    next_pack, next_robots, next_queue = next_state
+    original_reward = 0
+
+    c_robot = current_robots[action]
+    n_robot = next_robots[action]
+
+    current_time = c_robot.queue_time_from_start(NODE_DISTANCES)
+    next_time = n_robot.queue_time_from_start(NODE_DISTANCES)
+    move_task_duration = (next_time - current_time)
+    move_task_duration -= current_pack.time_assume(NODE_DISTANCES)
+
+    original_reward -= move_task_duration/50
+    threshold = 500
+    if next_time > threshold:
+      #exponent = int((next_time - threshold) / 100)
+      #original_reward -= min((1.2 ** exponent), 4)/4
+      original_reward -= (next_time - threshold)/100
+    return original_reward
