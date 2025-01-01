@@ -65,6 +65,9 @@ class JobSchedulerEnv:
 
   #@profile
   def step(self, action: int):
+    current_pack = self.scheduler.pack_queue[self.current_pack_id]
+    self.scheduler.distribute_policy.step_distribute(action, current_pack, self.scheduler.robots)
+    
     self.num_step += 1
     self.current_pack_id += 1
     if self.is_terminal:
