@@ -40,12 +40,11 @@ class Robot:
             
       move_task_durations = graph[current_node, destination]
       end_time += move_task_durations
-            
-      current_node = pack.start_node
-      destination = pack.target_node
-            
-      task_durations = graph[current_node, destination]
-      end_time += task_durations
+                  
+      pack_durations = pack.time_assume(graph)
+      end_time += pack_durations
+
+      current_node = pack.target_node
             
     return end_time
 
