@@ -16,6 +16,9 @@
 # （PyTorchのモデルファイルや、Pythonパス指定ファイル）
 *.pth
 
+# .csvファイル
+*.csv
+
 # ガントチャートのIPython Notebook
 gantt.ipynb
 
